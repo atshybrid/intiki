@@ -1,0 +1,272 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+  VENDOR
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum ShipmentStatus {
+  PICKED_UP
+  PACKED
+  EXPORT_CLEARED
+  IN_TRANSIT
+  DELIVERED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAUSED
+  CANCELLED
+}
+
+enum SampleRequestStatus {
+  PENDING
+  APPROVED
+  SHIPPED
+  COMPLETED
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  name          String
+  phone         String?
+  role          UserRole  @default(CUSTOMER)
+  avatar        String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  addresses     Address[]
+  orders        Order[]
+  subscriptions Subscription[]
+  sampleRequests SampleRequest[]
+  shipments     Shipment[]
+  referrals     Referral[]  @relation("Referrer")
+  referredBy    Referral?   @relation("Referred")
+  coupons       CouponUsage[]
+}
+
+model Address {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label     String
+  line1     String
+  line2     String?
+  city      String
+  state     String
+  country   String
+  pincode   String
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  emoji       String?
+  image       String?
+  products    Product[]
+  createdAt   DateTime  @default(now())
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String
+  price       Float
+  comparePrice Float?
+  images      String[]
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  vendorId    String?
+  vendor      Vendor?  @relation(fields: [vendorId], references: [id])
+  inStock     Boolean  @default(true)
+  isSample    Boolean  @default(false)
+  weight      Float?
+  tags        String[]
+  rating      Float    @default(0)
+  reviewCount Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orderItems  OrderItem[]
+  sampleItems SampleBoxItem[]
+}
+
+model Vendor {
+  id          String    @id @default(cuid())
+  name        String
+  email       String    @unique
+  phone       String
+  location    String
+  verified    Boolean   @default(false)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  orderNumber   String      @unique
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  status        OrderStatus @default(PENDING)
+  subtotal      Float
+  shipping      Float
+  discount      Float       @default(0)
+  total         Float
+  couponCode    String?
+  shippingAddress Json
+  notes         String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  items         OrderItem[]
+  shipment      Shipment?
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float
+}
+
+model Shipment {
+  id              String         @id @default(cuid())
+  trackingNumber  String         @unique
+  orderId         String?        @unique
+  order           Order?         @relation(fields: [orderId], references: [id])
+  userId          String
+  user            User           @relation(fields: [userId], references: [id])
+  status          ShipmentStatus @default(PICKED_UP)
+  type            String         @default("courier")
+  origin          Json
+  destination     Json
+  weight          Float?
+  videoUrl        String?
+  estimatedDelivery DateTime?
+  events          ShipmentEvent[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+model ShipmentEvent {
+  id          String         @id @default(cuid())
+  shipmentId  String
+  shipment    Shipment       @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  status      ShipmentStatus
+  location    String?
+  description String
+  timestamp   DateTime       @default(now())
+}
+
+model SampleRequest {
+  id        String              @id @default(cuid())
+  userId    String
+  user      User                @relation(fields: [userId], references: [id])
+  status    SampleRequestStatus @default(PENDING)
+  items     SampleBoxItem[]
+  shippingAddress Json
+  notes     String?
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+}
+
+model SampleBoxItem {
+  id              String        @id @default(cuid())
+  sampleRequestId String
+  sampleRequest   SampleRequest @relation(fields: [sampleRequestId], references: [id], onDelete: Cascade)
+  productId       String
+  product         Product       @relation(fields: [productId], references: [id])
+  quantity        Int           @default(1)
+}
+
+model Subscription {
+  id          String             @id @default(cuid())
+  userId      String
+  user        User               @relation(fields: [userId], references: [id])
+  planId      String
+  planName    String
+  price       Float
+  status      SubscriptionStatus @default(ACTIVE)
+  nextBilling DateTime
+  shippingAddress Json
+  preferences Json?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
+
+model FestivalBox {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String
+  price       Float
+  items       Json
+  emoji       String?
+  image       String?
+  festival    String
+  available   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+model Coupon {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  discount    Float
+  type        String   @default("percentage")
+  minOrder    Float?
+  maxUses     Int?
+  usedCount   Int      @default(0)
+  expiresAt   DateTime?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  usages      CouponUsage[]
+}
+
+model CouponUsage {
+  id       String @id @default(cuid())
+  couponId String
+  coupon   Coupon @relation(fields: [couponId], references: [id])
+  userId   String
+  user     User   @relation(fields: [userId], references: [id])
+  orderId  String
+  usedAt   DateTime @default(now())
+}
+
+model Referral {
+  id          String   @id @default(cuid())
+  referrerId  String
+  referrer    User     @relation("Referrer", fields: [referrerId], references: [id])
+  referredId  String   @unique
+  referred    User     @relation("Referred", fields: [referredId], references: [id])
+  reward      Float    @default(500)
+  claimed     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
