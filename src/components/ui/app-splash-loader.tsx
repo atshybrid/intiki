@@ -8,7 +8,7 @@ export function AppSplashLoader() {
   const [show, setShow] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShow(false), 1800);
+    const timer = setTimeout(() => setShow(false), 2200);
     return () => clearTimeout(timer);
   }, []);
 
