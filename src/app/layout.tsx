@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { Providers } from "@/providers/providers";
-import { BRAND } from "@/lib/constants";
+import { buildMetadata } from "@/lib/seo";
+import { SITE } from "@/lib/site";
 import "./globals.css";
 
 const inter = Inter({
@@ -15,42 +16,39 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
+  ...buildMetadata({
+    title: SITE.defaultTitle,
+    description: SITE.defaultDescription,
+    path: "/",
+  }),
   title: {
-    default: `${BRAND.name} — ${BRAND.tagline}`,
-    template: `%s | ${BRAND.name}`,
+    default: SITE.defaultTitle,
+    template: `%s | ${SITE.name}`,
   },
-  description: BRAND.description,
-  keywords: [
-    "NRI courier",
-    "Indian pickles abroad",
-    "send food from India",
-    "homemade food delivery",
-    "Indian products international",
-    "sample box",
-    "amma box",
-    "festival boxes",
-  ],
-  authors: [{ name: "Intiki" }],
-  openGraph: {
-    title: `${BRAND.name} — ${BRAND.tagline}`,
-    description: BRAND.description,
-    type: "website",
-    locale: "en_IN",
-    siteName: BRAND.name,
+  applicationName: SITE.name,
+  category: "shopping",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  icons: {
+    icon: "/images/Intiki_logo.png",
+    apple: "/images/Intiki_logo.png",
   },
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: BRAND.name,
+    title: SITE.name,
   },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  themeColor: "#005696",
+  maximumScale: 5,
+  themeColor: "#1B4332",
 };
 
 export default function RootLayout({
@@ -59,7 +57,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable} h-full`}>
+    <html lang="en-IN" className={`${inter.variable} ${playfair.variable} h-full`}>
       <body className="min-h-full flex flex-col antialiased">
         <Providers>{children}</Providers>
       </body>

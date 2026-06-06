@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { SEO_PAGES } from "@/lib/seo";
+
+export const metadata = SEO_PAGES.terms;
 
 export default function TermsPage() {
   return (

@@ -1,6 +1,9 @@
 import { BRAND } from "@/lib/constants";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, Globe, Shield, Users } from "lucide-react";
+import { SEO_PAGES } from "@/lib/seo";
+
+export const metadata = SEO_PAGES.about;
 
 export default function AboutPage() {
   return (

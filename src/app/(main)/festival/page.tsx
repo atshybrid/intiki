@@ -6,6 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getAllFestivalBoxes } from "@/lib/festival-data";
 import { formatPrice } from "@/lib/utils";
+import { SEO_PAGES } from "@/lib/seo";
+
+export const metadata = SEO_PAGES.festival;
 
 export default function FestivalPage() {
   const boxes = getAllFestivalBoxes();

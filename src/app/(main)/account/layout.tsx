@@ -1,0 +1,10 @@
+import { NOINDEX_METADATA } from "@/lib/seo";
+
+export const metadata = {
+  ...NOINDEX_METADATA,
+  title: "My Account",
+};
+
+export default function AccountLayout({ children }: { children: React.ReactNode }) {
+  return children;
+}

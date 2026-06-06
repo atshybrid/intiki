@@ -1,4 +1,10 @@
 import { Logo } from "@/components/layout/logo";
+import { NOINDEX_METADATA } from "@/lib/seo";
+
+export const metadata = {
+  ...NOINDEX_METADATA,
+  title: "Login / Register",
+};
 
 export default function AuthLayout({
   children,

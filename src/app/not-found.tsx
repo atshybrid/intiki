@@ -1,6 +1,13 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/layout/logo";
+import { buildMetadata } from "@/lib/seo";
+
+export const metadata = buildMetadata({
+  title: "Page Not Found",
+  description: "The page you are looking for could not be found on Intiki.",
+  noIndex: true,
+});
 
 export default function NotFound() {
   return (

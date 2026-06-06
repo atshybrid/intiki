@@ -10,10 +10,28 @@ import { PromoCardsSection } from "@/components/home/promo-cards-section";
 import { SubscriptionSection } from "@/components/home/subscription-section";
 import { TestimonialsSection } from "@/components/home/testimonials-section";
 import { FAQSection } from "@/components/home/faq-section";
+import { JsonLd } from "@/components/seo/json-ld";
+import {
+  courierServiceSchema,
+  faqSchema,
+  organizationSchema,
+  SEO_PAGES,
+  websiteSchema,
+} from "@/lib/seo";
+
+export const metadata = SEO_PAGES.home;
 
 export default function HomePage() {
   return (
     <>
+      <JsonLd
+        data={[
+          organizationSchema(),
+          websiteSchema(),
+          courierServiceSchema(),
+          faqSchema(),
+        ]}
+      />
       <HeroSection />
       <FeaturesBar />
       <CourierSection />
